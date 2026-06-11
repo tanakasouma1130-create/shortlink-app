@@ -3,36 +3,75 @@
 import { useState } from "react";
 
 export default function Home() {
-  const [image, setImage] = useState("");
+  const [file, setFile] = useState(null);
   const [url, setUrl] = useState("");
   const [result, setResult] = useState("");
 
   async function createLink() {
+    if (!file) return alert("画像を選択");
+
+    const form = new FormData();
+    form.append("file", file);
+
+    const upload = await fetch("/api/upload", {
+      method: "POST",
+      body: form,
+    });
+
+    const imageData = await upload.json();
+
     const res = await fetch("/api/create", {
       method: "POST",
       headers: {
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
       },
-      body: JSON.stringify({ image, url })
+      body: JSON.stringify({
+        image: imageData.url,
+        url,
+      }),
     });
 
     const data = await res.json();
-    setResult(location.origin + "/s/" + data.id);
+
+    setResult(
+      `${location.origin}/s/${data.id}`
+    );
   }
 
   return (
-    <div style={{ maxWidth: "500px", margin: "50px auto", padding: "20px", fontFamily: "sans-serif" }}>
+    <div style={{
+      maxWidth:"500px",
+      margin:"50px auto",
+      padding:"20px"
+    }}>
       <h1>OGP短縮リンク作成</h1>
 
-      <input placeholder="画像URL" value={image} onChange={(e) => setImage(e.target.value)} style={{ width: "100%", padding: "10px", marginBottom: "10px" }} />
+      <input
+        type="file"
+        accept="image/*"
+        onChange={(e)=>setFile(e.target.files[0])}
+      />
 
-      <input placeholder="飛び先URL" value={url} onChange={(e) => setUrl(e.target.value)} style={{ width: "100%", padding: "10px", marginBottom: "10px" }} />
+      <br /><br />
 
-      <button onClick={createLink} style={{ width: "100%", padding: "12px" }}>作成</button>
+      <input
+        placeholder="飛び先URL"
+        value={url}
+        onChange={(e)=>setUrl(e.target.value)}
+        style={{
+          width:"100%",
+          padding:"10px"
+        }}
+      />
+
+      <br /><br />
+
+      <button onClick={createLink}>
+        作成
+      </button>
 
       {result && (
         <p>
-          完成リンク：<br />
           <a href={result}>{result}</a>
         </p>
       )}
