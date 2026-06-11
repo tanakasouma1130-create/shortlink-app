@@ -4,7 +4,9 @@ export async function POST(req) {
   const form = await req.formData();
   const file = form.get("file");
 
-  const blob = await put(file.name, file, {
+  const filename = `${Date.now()}-${file.name}`;
+
+  const blob = await put(filename, file, {
     access: "public",
   });
 
