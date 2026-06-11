@@ -4,13 +4,15 @@ export async function POST(req) {
   const form = await req.formData();
   const file = form.get("file");
 
-  const filename = `${Date.now()}-${file.name}`;
-
-  const blob = await put(filename, file, {
-    access: "public",
-  });
+  const blob = await put(
+    `uploads/${Date.now()}.png`,
+    file,
+    {
+      access: "public"
+    }
+  );
 
   return Response.json({
-    url: blob.url,
+    url: blob.url
   });
 }
