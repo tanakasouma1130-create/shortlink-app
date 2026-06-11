@@ -11,17 +11,18 @@ export async function generateMetadata({ params }) {
   }
 
   return {
-    title: "詳細はこちら",
-    description: "再生するにはタップ",
+    title: "OGPリンク",
+    description: "画像付きリンク",
     openGraph: {
-      title: "詳細はこちら",
-      description: "再生するにはタップ",
-      images: [data.image]
+      title: "OGPリンク",
+      description: "画像付きリンク",
+      images: [data.image],
+      url: data.url
     },
     twitter: {
       card: "summary_large_image",
-      title: "詳細はこちら",
-      description: "再生するにはタップ",
+      title: "OGPリンク",
+      description: "画像付きリンク",
       images: [data.image]
     }
   };
@@ -31,7 +32,7 @@ export default async function Page({ params }) {
   const data = await kv.get(`link:${params.id}`);
 
   if (!data) {
-    return <h1>リンクが見つかりません</h1>;
+    return <p>リンクが見つかりません</p>;
   }
 
   redirect(data.url);
