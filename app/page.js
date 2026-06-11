@@ -10,7 +10,8 @@ export default function Home() {
 
   async function createLink() {
     try {
-      setMessage("作成中...");
+      setMessage("アップロード中...");
+      setResult("");
 
       if (!file) {
         setMessage("画像を選択してください");
@@ -25,12 +26,16 @@ export default function Home() {
         body: form
       });
 
-      const imageData = await upload.json();
+      const uploadText = await upload.text();
 
       if (!upload.ok) {
-        setMessage("upload失敗: " + JSON.stringify(imageData));
+        setMessage("upload失敗: " + uploadText);
         return;
       }
+
+      const imageData = JSON.parse(uploadText);
+
+      setMessage("リンク作成中...");
 
       const res = await fetch("/api/create", {
         method: "POST",
@@ -43,17 +48,19 @@ export default function Home() {
         })
       });
 
-      const data = await res.json();
+      const createText = await res.text();
 
       if (!res.ok) {
-        setMessage("create失敗: " + JSON.stringify(data));
+        setMessage("create失敗: " + createText);
         return;
       }
+
+      const data = JSON.parse(createText);
 
       setResult(`${location.origin}/s/${data.id}`);
       setMessage("完成！");
     } catch (e) {
-      setMessage("エラー: " + e.message);
+      setMessage("エラー詳細: " + e.message);
     }
   }
 
@@ -67,8 +74,7 @@ export default function Home() {
         onChange={(e) => setFile(e.target.files[0])}
       />
 
-      <br />
-      <br />
+      <br /><br />
 
       <input
         placeholder="飛び先URL"
@@ -77,8 +83,7 @@ export default function Home() {
         style={{ width: "100%", padding: "10px" }}
       />
 
-      <br />
-      <br />
+      <br /><br />
 
       <button onClick={createLink}>作成</button>
 
