@@ -1,13 +1,23 @@
-import { kv } from "@vercel/kv";
-import { redirect } from "next/navigation";
+async function getData(id) {
+  const res = await fetch(
+    `${process.env.KV_REST_API_URL}/get/link:${id}`,
+    {
+      headers: {
+        Authorization: `Bearer ${process.env.KV_REST_API_TOKEN}`
+      },
+      cache: "no-store"
+    }
+  );
+
+  const data = await res.json();
+  return data.result;
+}
 
 export async function generateMetadata({ params }) {
-  const data = await kv.get(`link:${params.id}`);
+  const data = await getData(params.id);
 
   if (!data) {
-    return {
-      title: "リンクが見つかりません"
-    };
+    return { title: "リンクが見つかりません" };
   }
 
   return {
@@ -17,7 +27,8 @@ export async function generateMetadata({ params }) {
       title: "OGPリンク",
       description: "画像付きリンク",
       images: [data.image],
-      url: data.url
+      url: data.url,
+      type: "website"
     },
     twitter: {
       card: "summary_large_image",
@@ -29,11 +40,23 @@ export async function generateMetadata({ params }) {
 }
 
 export default async function Page({ params }) {
-  const data = await kv.get(`link:${params.id}`);
+  const data = await getData(params.id);
 
   if (!data) {
     return <p>リンクが見つかりません</p>;
   }
 
-  redirect(data.url);
+  return (
+    <html>
+      <body>
+        <p>移動中...</p>
+        <a href={data.url}>開く</a>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `location.href = "${data.url}";`
+          }}
+        />
+      </body>
+    </html>
+  );
 }
