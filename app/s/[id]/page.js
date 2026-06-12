@@ -1,25 +1,16 @@
-import RedirectClient from "./RedirectClient";
-
 async function getData(id) {
-  const res = await fetch(
-    `${process.env.KV_REST_API_URL}/get/link:${id}`,
-    {
-      headers: {
-        Authorization: `Bearer ${process.env.KV_REST_API_TOKEN}`
-      },
-      cache: "no-store"
-    }
-  );
+  const res = await fetch(`${process.env.KV_REST_API_URL}/get/link:${id}`, {
+    headers: {
+      Authorization: `Bearer ${process.env.KV_REST_API_TOKEN}`
+    },
+    cache: "no-store"
+  });
 
   const json = await res.json();
   const result = json.result;
 
   if (!result) return null;
-
-  if (typeof result === "string") {
-    return JSON.parse(result);
-  }
-
+  if (typeof result === "string") return JSON.parse(result);
   return result;
 }
 
@@ -27,9 +18,7 @@ export async function generateMetadata({ params }) {
   const data = await getData(params.id);
 
   if (!data) {
-    return {
-      title: "詳細はこちら"
-    };
+    return { title: "詳細はこちら" };
   }
 
   return {
@@ -57,5 +46,21 @@ export default async function Page({ params }) {
     return <p>リンクが見つかりません</p>;
   }
 
-  return <RedirectClient url={data.url} />;
+  return (
+    <>
+      <meta httpEquiv="refresh" content={`0.5;url=${data.url}`} />
+
+      <div
+        style={{
+          background: "#000",
+          color: "#000",
+          width: "100vw",
+          height: "100vh",
+          overflow: "hidden"
+        }}
+      >
+        移動中...
+      </div>
+    </>
+  );
 }
