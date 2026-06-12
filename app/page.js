@@ -57,7 +57,7 @@ export default function Home() {
 
       const data = JSON.parse(createText);
 
-      setResult(`${location.origin}/s/${data.id}`);
+      setResult(`https://shortlink-app-one.vercel.app/s/${data.id}`);
       setMessage("完成！");
     } catch (e) {
       setMessage("エラー詳細: " + e.message);
