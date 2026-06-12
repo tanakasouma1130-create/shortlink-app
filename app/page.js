@@ -4,6 +4,7 @@ import { useState } from "react";
 
 export default function Home() {
   const [title, setTitle] = useState("");
+  const [redirectUrl, setRedirectUrl] = useState("");
   const [image, setImage] = useState<File | null>(null);
   const [shortUrl, setShortUrl] = useState("");
 
@@ -15,8 +16,14 @@ export default function Home() {
       return;
     }
 
+    if (!redirectUrl) {
+      alert("リダイレクト先URLを入力してください");
+      return;
+    }
+
     const formData = new FormData();
     formData.append("title", title);
+    formData.append("redirectUrl", redirectUrl);
     formData.append("image", image);
 
     const res = await fetch("/api/create", {
@@ -41,6 +48,20 @@ export default function Home() {
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             placeholder="例：新しいお知らせ"
+            style={{ width: "100%", maxWidth: 400, padding: 8 }}
+          />
+        </div>
+
+        <br />
+
+        <div>
+          <label>リダイレクト先URL</label>
+          <br />
+          <input
+            type="url"
+            value={redirectUrl}
+            onChange={(e) => setRedirectUrl(e.target.value)}
+            placeholder="https://example.com"
             style={{ width: "100%", maxWidth: 400, padding: 8 }}
           />
         </div>
