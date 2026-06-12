@@ -46,8 +46,8 @@ export async function POST(req) {
       if (usage >= 1) {
         return NextResponse.json(
           {
-            error: "無料作成は1回までです。Proに登録してください。",
-            needPro: true,
+            error: "無料作成は1回までです。Proプランに加入してください。",
+            upgrade: true,
           },
           { status: 402 }
         );
@@ -65,12 +65,13 @@ export async function POST(req) {
 
     await kv.set(`link:${id}`, {
       title: safeTitle,
-      imageUrl: blob.url,
-      redirectUrl,
+      image: blob.url,
+      url: redirectUrl,
     });
 
     if (!isAdmin && !isPro) {
-      await kv.set(`usage:${userId}`, 1);
+      const usage = Number((await kv.get(`usage:${userId}`)) || 0);
+      await kv.set(`usage:${userId}`, usage + 1);
     }
 
     const shortUrl = `https://shortlink-app-one.vercel.app/s/${id}`;
@@ -90,9 +91,7 @@ export async function POST(req) {
     console.error(error);
 
     return NextResponse.json(
-      {
-        error: String(error),
-      },
+      { error: String(error) },
       { status: 500 }
     );
   }
