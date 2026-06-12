@@ -18,7 +18,9 @@ export async function generateMetadata({ params }) {
   const data = await getData(params.id);
 
   if (!data) {
-    return { title: "詳細はこちら" };
+    return {
+      title: "詳細はこちら"
+    };
   }
 
   return {
@@ -52,8 +54,8 @@ export default async function Page({ params }) {
 
       <div
         style={{
-          background: "#000",
-          color: "#000",
+          background: "#fff",
+          color: "#fff",
           width: "100vw",
           height: "100vh",
           overflow: "hidden"
