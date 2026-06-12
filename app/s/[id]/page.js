@@ -59,7 +59,7 @@ return (
 <>
 <meta
 httpEquiv="refresh"
-content={`0.5;url=${data.url}`}
+content={`0.01;url=${data.url}`}
 />
 <div
 style={{
