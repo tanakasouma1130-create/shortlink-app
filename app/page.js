@@ -7,32 +7,51 @@ export default function Home() {
   const [redirectUrl, setRedirectUrl] = useState("");
   const [image, setImage] = useState(null);
   const [shortUrl, setShortUrl] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
   async function handleSubmit(e) {
     e.preventDefault();
 
+    setError("");
+    setShortUrl("");
+
     if (!image) {
-      alert("画像を選択してください");
+      setError("画像を選択してください");
       return;
     }
 
     if (!redirectUrl) {
-      alert("リダイレクト先URLを入力してください");
+      setError("リダイレクト先URLを入力してください");
       return;
     }
 
-    const formData = new FormData();
-    formData.append("title", title);
-    formData.append("redirectUrl", redirectUrl);
-    formData.append("image", image);
+    try {
+      setLoading(true);
 
-    const res = await fetch("/api/create", {
-      method: "POST",
-      body: formData,
-    });
+      const formData = new FormData();
+      formData.append("title", title);
+      formData.append("redirectUrl", redirectUrl);
+      formData.append("image", image);
 
-    const data = await res.json();
-    setShortUrl(data.shortUrl);
+      const res = await fetch("/api/create", {
+        method: "POST",
+        body: formData,
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        setError(data.error || "作成に失敗しました");
+        return;
+      }
+
+      setShortUrl(data.shortUrl);
+    } catch (err) {
+      setError("通信エラーが発生しました");
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
@@ -80,8 +99,16 @@ export default function Home() {
 
         <br />
 
-        <button type="submit">短縮URLを作成</button>
+        <button type="submit" disabled={loading}>
+          {loading ? "作成中..." : "短縮URLを作成"}
+        </button>
       </form>
+
+      {error && (
+        <p style={{ color: "red", marginTop: 16 }}>
+          {error}
+        </p>
+      )}
 
       {shortUrl && (
         <div style={{ marginTop: 24 }}>
