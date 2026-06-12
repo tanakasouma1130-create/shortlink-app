@@ -6,12 +6,12 @@ function generateId() {
   return Math.random().toString(36).slice(2, 8);
 }
 
-export async function POST(req: Request) {
+export async function POST(req) {
   const formData = await req.formData();
 
-  const title = formData.get("title") as string;
-  const redirectUrl = formData.get("redirectUrl") as string;
-  const image = formData.get("image") as File;
+  const title = formData.get("title");
+  const redirectUrl = formData.get("redirectUrl");
+  const image = formData.get("image");
 
   if (!image) {
     return NextResponse.json(
