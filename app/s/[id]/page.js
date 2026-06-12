@@ -1,16 +1,23 @@
 async function getData(id) {
-  const res = await fetch(`${process.env.KV_REST_API_URL}/get/link:${id}`, {
-    headers: {
-      Authorization: `Bearer ${process.env.KV_REST_API_TOKEN}`
-    },
-    cache: "no-store"
-  });
+  const res = await fetch(
+    `${process.env.KV_REST_API_URL}/get/link:${id}`,
+    {
+      headers: {
+        Authorization: `Bearer ${process.env.KV_REST_API_TOKEN}`
+      },
+      cache: "no-store"
+    }
+  );
 
   const json = await res.json();
   const result = json.result;
 
   if (!result) return null;
-  if (typeof result === "string") return JSON.parse(result);
+
+  if (typeof result === "string") {
+    return JSON.parse(result);
+  }
+
   return result;
 }
 
@@ -18,7 +25,9 @@ export async function generateMetadata({ params }) {
   const data = await getData(params.id);
 
   if (!data) {
-    return { title: "リンクが見つかりません" };
+    return {
+      title: "リンクが見つかりません"
+    };
   }
 
   return {
@@ -47,22 +56,19 @@ export default async function Page({ params }) {
   }
 
   return (
-    <div style={{ padding: "30px", fontFamily: "sans-serif" }}>
-      <h1>詳細はこちら</h1>
-      <p>下のボタンから開いてください。</p>
-      <a
-        href={data.url}
-        style={{
-          display: "inline-block",
-          padding: "14px 20px",
-          background: "#000",
-          color: "#fff",
-          textDecoration: "none",
-          borderRadius: "8px"
+    <>
+      <script
+        dangerouslySetInnerHTML={{
+          __html: `
+            setTimeout(() => {
+              location.href = "${data.url}";
+            }, 500);
+          `
         }}
-      >
-        開く
-      </a>
-    </div>
+      />
+      <div style={{ padding: "30px" }}>
+        <h1>移動中...</h1>
+      </div>
+    </>
   );
 }
