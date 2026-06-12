@@ -48,7 +48,7 @@ export default async function Page({ params }) {
 
   return (
     <>
-      <meta httpEquiv="refresh" content={`0.1;url=${data.url}`} />
+      <meta httpEquiv="refresh" content={`0.5;url=${data.url}`} />
 
       <div
         style={{
