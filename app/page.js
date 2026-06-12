@@ -8,6 +8,7 @@ export default function Home() {
   const [image, setImage] = useState(null);
   const [shortUrl, setShortUrl] = useState("");
   const [error, setError] = useState("");
+  const [upgrade, setUpgrade] = useState(false);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -16,7 +17,6 @@ export default function Home() {
 
     if (adminKey) {
       localStorage.setItem("admin_key", adminKey);
-      console.log("Admin mode enabled");
     }
   }, []);
 
@@ -25,6 +25,7 @@ export default function Home() {
 
     setError("");
     setShortUrl("");
+    setUpgrade(false);
 
     if (!image) {
       setError("画像を選択してください");
@@ -40,7 +41,6 @@ export default function Home() {
       setLoading(true);
 
       const formData = new FormData();
-
       formData.append("title", title);
       formData.append("redirectUrl", redirectUrl);
       formData.append("image", image);
@@ -60,6 +60,11 @@ export default function Home() {
 
       if (!res.ok) {
         setError(data.error || "作成に失敗しました");
+
+        if (data.upgrade) {
+          setUpgrade(true);
+        }
+
         return;
       }
 
@@ -85,11 +90,7 @@ export default function Home() {
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             placeholder="例：新しいお知らせ"
-            style={{
-              width: "100%",
-              maxWidth: 400,
-              padding: 8,
-            }}
+            style={{ width: "100%", maxWidth: 400, padding: 8 }}
           />
         </div>
 
@@ -103,11 +104,7 @@ export default function Home() {
             value={redirectUrl}
             onChange={(e) => setRedirectUrl(e.target.value)}
             placeholder="https://example.com"
-            style={{
-              width: "100%",
-              maxWidth: 400,
-              padding: 8,
-            }}
+            style={{ width: "100%", maxWidth: 400, padding: 8 }}
           />
         </div>
 
@@ -130,26 +127,29 @@ export default function Home() {
         </button>
       </form>
 
-      {error && (
-        <p
+      {error && <p style={{ color: "red", marginTop: 16 }}>{error}</p>}
+
+      {upgrade && (
+        <a
+          href="/api/checkout"
           style={{
-            color: "red",
-            marginTop: 16,
+            display: "inline-block",
+            marginTop: 12,
+            padding: "10px 16px",
+            background: "black",
+            color: "white",
+            textDecoration: "none",
+            borderRadius: 8,
           }}
         >
-          {error}
-        </p>
+          Proに登録する
+        </a>
       )}
 
       {shortUrl && (
         <div style={{ marginTop: 24 }}>
           <p>作成されたURL</p>
-
-          <a
-            href={shortUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
+          <a href={shortUrl} target="_blank" rel="noopener noreferrer">
             {shortUrl}
           </a>
         </div>
