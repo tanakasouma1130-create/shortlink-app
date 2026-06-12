@@ -5,10 +5,10 @@ import { useState } from "react";
 export default function Home() {
   const [title, setTitle] = useState("");
   const [redirectUrl, setRedirectUrl] = useState("");
-  const [image, setImage] = useState<File | null>(null);
+  const [image, setImage] = useState(null);
   const [shortUrl, setShortUrl] = useState("");
 
-  async function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e) {
     e.preventDefault();
 
     if (!image) {
