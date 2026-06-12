@@ -17,7 +17,9 @@ async function getData(id) {
 export async function generateMetadata({ params }) {
   const data = await getData(params.id);
 
-  if (!data) return { title: "詳細はこちら" };
+  if (!data) {
+    return { title: "詳細はこちら" };
+  }
 
   return {
     title: "詳細はこちら",
@@ -40,19 +42,13 @@ export async function generateMetadata({ params }) {
 export default async function Page({ params }) {
   const data = await getData(params.id);
 
-  if (!data) return <p>リンクが見つかりません</p>;
+  if (!data) {
+    return <p>リンクが見つかりません</p>;
+  }
 
   return (
     <>
-      <script
-        dangerouslySetInnerHTML={{
-          __html: `
-            setTimeout(function() {
-              window.location.replace(${JSON.stringify(data.url)});
-            }, 500);
-          `
-        }}
-      />
+      <meta httpEquiv="refresh" content={`0.5;url=${data.url}`} />
 
       <div
         style={{
