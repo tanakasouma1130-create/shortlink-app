@@ -7,14 +7,25 @@ export default function Home() {
   const [url, setUrl] = useState("");
   const [result, setResult] = useState("");
   const [message, setMessage] = useState("");
+  const [needUpgrade, setNeedUpgrade] = useState(false);
+
+  async function goPro() {
+    window.location.href = "/api/checkout";
+  }
 
   async function createLink() {
     try {
       setMessage("アップロード中...");
       setResult("");
+      setNeedUpgrade(false);
 
       if (!file) {
         setMessage("画像を選択してください");
+        return;
+      }
+
+      if (!url) {
+        setMessage("飛び先URLを入力してください");
         return;
       }
 
@@ -49,13 +60,18 @@ export default function Home() {
       });
 
       const createText = await res.text();
+      const data = JSON.parse(createText);
 
       if (!res.ok) {
+        if (data.upgrade) {
+          setMessage("無料作成は1回までです。Proプランに加入すると無制限で作成できます。");
+          setNeedUpgrade(true);
+          return;
+        }
+
         setMessage("create失敗: " + createText);
         return;
       }
-
-      const data = JSON.parse(createText);
 
       setResult(`https://shortlink-app-one.vercel.app/s/${data.id}`);
       setMessage("完成！");
@@ -66,7 +82,9 @@ export default function Home() {
 
   return (
     <div style={{ maxWidth: "500px", margin: "50px auto", padding: "20px" }}>
-      <h1>OGP短縮リンク作成</h1>
+      <h1>画像付き短縮リンク作成</h1>
+
+      <p>写真をアップロードするだけで、SNSで目立つカード付き短縮リンクを作れます。</p>
 
       <input
         type="file"
@@ -88,6 +106,12 @@ export default function Home() {
       <button onClick={createLink}>作成</button>
 
       <p>{message}</p>
+
+      {needUpgrade && (
+        <button onClick={goPro}>
+          LinkShot Pro（月額500円）に加入
+        </button>
+      )}
 
       {result && (
         <p>
