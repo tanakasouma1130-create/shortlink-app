@@ -1,3 +1,6 @@
+import { headers } from "next/headers";
+import { redirect } from "next/navigation";
+
 async function getData(id) {
   const res = await fetch(`${process.env.KV_REST_API_URL}/get/link:${id}`, {
     headers: {
@@ -17,9 +20,7 @@ async function getData(id) {
 export async function generateMetadata({ params }) {
   const data = await getData(params.id);
 
-  if (!data) {
-    return { title: "詳細はこちら" };
-  }
+  if (!data) return { title: "詳細はこちら" };
 
   return {
     title: "詳細はこちら",
@@ -42,25 +43,23 @@ export async function generateMetadata({ params }) {
 export default async function Page({ params }) {
   const data = await getData(params.id);
 
-  if (!data) {
-    return <p>リンクが見つかりません</p>;
+  if (!data) return <p>リンクが見つかりません</p>;
+
+  const userAgent = headers().get("user-agent") || "";
+
+  const isBot =
+    userAgent.includes("Twitterbot") ||
+    userAgent.includes("facebookexternalhit") ||
+    userAgent.includes("Discordbot") ||
+    userAgent.includes("Slackbot");
+
+  if (!isBot) {
+    redirect(data.url);
   }
 
   return (
-    <>
-      <meta httpEquiv="refresh" content={`0.5;url=${data.url}`} />
-
-      <div
-        style={{
-          background: "#000",
-          color: "#000",
-          width: "100vw",
-          height: "100vh",
-          overflow: "hidden"
-        }}
-      >
-        移動中...
-      </div>
-    </>
+    <div style={{ background: "#000", color: "#000", height: "100vh" }}>
+      移動中...
+    </div>
   );
 }
