@@ -30,9 +30,16 @@ export default function Home() {
       setLoading(true);
 
       const formData = new FormData();
+
       formData.append("title", title);
       formData.append("redirectUrl", redirectUrl);
       formData.append("image", image);
+
+      const adminKey = localStorage.getItem("admin_key");
+
+      if (adminKey) {
+        formData.append("adminKey", adminKey);
+      }
 
       const res = await fetch("/api/create", {
         method: "POST",
@@ -48,6 +55,7 @@ export default function Home() {
 
       setShortUrl(data.shortUrl);
     } catch (err) {
+      console.error(err);
       setError("通信エラーが発生しました");
     } finally {
       setLoading(false);
@@ -56,7 +64,7 @@ export default function Home() {
 
   return (
     <main style={{ padding: 24 }}>
-      <h1>OGP短縮リンク作成</h1>
+      <h1>LinkShot</h1>
 
       <form onSubmit={handleSubmit}>
         <div>
@@ -67,7 +75,11 @@ export default function Home() {
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             placeholder="例：新しいお知らせ"
-            style={{ width: "100%", maxWidth: 400, padding: 8 }}
+            style={{
+              width: "100%",
+              maxWidth: 400,
+              padding: 8,
+            }}
           />
         </div>
 
@@ -81,7 +93,11 @@ export default function Home() {
             value={redirectUrl}
             onChange={(e) => setRedirectUrl(e.target.value)}
             placeholder="https://example.com"
-            style={{ width: "100%", maxWidth: 400, padding: 8 }}
+            style={{
+              width: "100%",
+              maxWidth: 400,
+              padding: 8,
+            }}
           />
         </div>
 
@@ -93,7 +109,9 @@ export default function Home() {
           <input
             type="file"
             accept="image/*"
-            onChange={(e) => setImage(e.target.files?.[0] ?? null)}
+            onChange={(e) =>
+              setImage(e.target.files?.[0] ?? null)
+            }
           />
         </div>
 
@@ -105,7 +123,12 @@ export default function Home() {
       </form>
 
       {error && (
-        <p style={{ color: "red", marginTop: 16 }}>
+        <p
+          style={{
+            color: "red",
+            marginTop: 16,
+          }}
+        >
           {error}
         </p>
       )}
@@ -113,7 +136,12 @@ export default function Home() {
       {shortUrl && (
         <div style={{ marginTop: 24 }}>
           <p>作成されたURL</p>
-          <a href={shortUrl} target="_blank">
+
+          <a
+            href={shortUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
             {shortUrl}
           </a>
         </div>
