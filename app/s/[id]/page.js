@@ -1,16 +1,17 @@
 async function getData(id) {
-  const res = await fetch(
-    `${process.env.KV_REST_API_URL}/get/link:${id}`,
-    {
-      headers: {
-        Authorization: `Bearer ${process.env.KV_REST_API_TOKEN}`
-      },
-      cache: "no-store"
-    }
-  );
+  const res = await fetch(`${process.env.KV_REST_API_URL}/get/link:${id}`, {
+    headers: {
+      Authorization: `Bearer ${process.env.KV_REST_API_TOKEN}`
+    },
+    cache: "no-store"
+  });
 
-  const data = await res.json();
-  return data.result;
+  const json = await res.json();
+  const result = json.result;
+
+  if (!result) return null;
+  if (typeof result === "string") return JSON.parse(result);
+  return result;
 }
 
 export async function generateMetadata({ params }) {
@@ -21,19 +22,18 @@ export async function generateMetadata({ params }) {
   }
 
   return {
-    title: "OGPリンク",
-    description: "画像付きリンク",
+    title: "詳細はこちら",
+    description: "タップして開く",
     openGraph: {
-      title: "OGPリンク",
-      description: "画像付きリンク",
+      title: "詳細はこちら",
+      description: "タップして開く",
       images: [data.image],
-      url: data.url,
       type: "website"
     },
     twitter: {
       card: "summary_large_image",
-      title: "OGPリンク",
-      description: "画像付きリンク",
+      title: "詳細はこちら",
+      description: "タップして開く",
       images: [data.image]
     }
   };
@@ -47,16 +47,22 @@ export default async function Page({ params }) {
   }
 
   return (
-    <html>
-      <body>
-        <p>移動中...</p>
-        <a href={data.url}>開く</a>
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `location.href = "${data.url}";`
-          }}
-        />
-      </body>
-    </html>
+    <div style={{ padding: "30px", fontFamily: "sans-serif" }}>
+      <h1>詳細はこちら</h1>
+      <p>下のボタンから開いてください。</p>
+      <a
+        href={data.url}
+        style={{
+          display: "inline-block",
+          padding: "14px 20px",
+          background: "#000",
+          color: "#fff",
+          textDecoration: "none",
+          borderRadius: "8px"
+        }}
+      >
+        開く
+      </a>
+    </div>
   );
 }
