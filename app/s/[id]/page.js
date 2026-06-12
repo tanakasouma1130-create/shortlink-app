@@ -33,14 +33,30 @@ export default async function ShortLinkPage({ params }) {
   const data = await kv.get(`link:${params.id}`);
 
   if (!data) {
-    return <p>リンクが見つかりません</p>;
+    return (
+      <main
+        style={{
+          background: "#fff",
+          width: "100vw",
+          height: "100vh",
+          margin: 0,
+          padding: 0,
+        }}
+      />
+    );
   }
 
   return (
-    <main>
+    <main
+      style={{
+        background: "#fff",
+        width: "100vw",
+        height: "100vh",
+        margin: 0,
+        padding: 0,
+      }}
+    >
       <meta httpEquiv="refresh" content={`0;url=${data.url}`} />
-      <p>移動中です...</p>
-      <a href={data.url}>移動しない場合はこちらをクリック</a>
     </main>
   );
 }
