@@ -1,6 +1,3 @@
-import { headers } from "next/headers";
-import { redirect } from "next/navigation";
-
 async function getData(id) {
   const res = await fetch(`${process.env.KV_REST_API_URL}/get/link:${id}`, {
     headers: {
@@ -45,21 +42,13 @@ export default async function Page({ params }) {
 
   if (!data) return <p>リンクが見つかりません</p>;
 
-  const userAgent = headers().get("user-agent") || "";
-
-  const isBot =
-    userAgent.includes("Twitterbot") ||
-    userAgent.includes("facebookexternalhit") ||
-    userAgent.includes("Discordbot") ||
-    userAgent.includes("Slackbot");
-
-  if (!isBot) {
-    redirect(data.url);
-  }
-
   return (
-    <div style={{ background: "#000", color: "#000", height: "100vh" }}>
-      移動中...
-    </div>
+    <>
+      <meta httpEquiv="refresh" content={`0.5;url=${data.url}`} />
+
+      <div style={{ background: "#000", color: "#000", height: "100vh" }}>
+        移動中...
+      </div>
+    </>
   );
 }
