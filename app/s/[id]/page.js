@@ -1,68 +1,54 @@
-async function getData(id) {
-  const res = await fetch(`${process.env.KV_REST_API_URL}/get/link:${id}`, {
-    headers: {
-      Authorization: `Bearer ${process.env.KV_REST_API_TOKEN}`
-    },
-    cache: "no-store"
-  });
+import { kv } from "@vercel/kv";
+import { Metadata } from "next";
+import { redirect } from "next/navigation";
 
-  const json = await res.json();
-  const result = json.result;
+type PageProps = {
+  params: {
+    id: string;
+  };
+};
 
-  if (!result) return null;
-  if (typeof result === "string") return JSON.parse(result);
-  return result;
-}
+type LinkData = {
+  title: string;
+  imageUrl: string;
+  redirectUrl?: string;
+};
 
-export async function generateMetadata({ params }) {
-  const data = await getData(params.id);
+export async function generateMetadata({
+  params,
+}: PageProps): Promise<Metadata> {
+  const data = await kv.get<LinkData>(params.id);
 
   if (!data) {
     return {
-      title: "詳細はこちら"
+      title: "リンクが見つかりません",
     };
   }
 
   return {
-    title: "詳細はこちら",
-    description: "タップして開く",
+    title: data.title,
     openGraph: {
-      title: "詳細はこちら",
-      description: "タップして開く",
-      images: [data.image],
-      type: "website"
+      title: data.title,
+      images: [
+        {
+          url: data.imageUrl,
+        },
+      ],
     },
     twitter: {
       card: "summary_large_image",
-      title: "詳細はこちら",
-      description: "タップして開く",
-      images: [data.image]
-    }
+      title: data.title,
+      images: [data.imageUrl],
+    },
   };
 }
 
-export default async function Page({ params }) {
-  const data = await getData(params.id);
+export default async function ShortLinkPage({ params }: PageProps) {
+  const data = await kv.get<LinkData>(params.id);
 
   if (!data) {
     return <p>リンクが見つかりません</p>;
   }
 
-  return (
-    <>
-      <meta httpEquiv="refresh" content={`0.5;url=${data.url}`} />
-
-      <div
-        style={{
-          background: "#fff",
-          color: "#fff",
-          width: "100vw",
-          height: "100vh",
-          overflow: "hidden"
-        }}
-      >
-        移動中...
-      </div>
-    </>
-  );
+  redirect(data.redirectUrl || "https://shortlink-app-one.vercel.app");
 }
