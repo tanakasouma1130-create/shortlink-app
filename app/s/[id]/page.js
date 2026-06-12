@@ -26,7 +26,7 @@ const data = await getData(params.id);
 
 if (!data) {
 return {
-title: "リンクが見つかりません"
+title: "詳細はこちら"
 };
 }
 
@@ -61,6 +61,21 @@ return (
 httpEquiv="refresh"
 content={`0.1;url=${data.url}`}
 />
+
+```
+  <div
+    style={{
+      background: "#000",
+      color: "#000",
+      width: "100vw",
+      height: "100vh",
+      overflow: "hidden"
+    }}
+  >
+    移動中...
+  </div>
 </>
+```
+
 );
 }
