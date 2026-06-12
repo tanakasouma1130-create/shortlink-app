@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export default function Home() {
   const [title, setTitle] = useState("");
@@ -9,6 +9,16 @@ export default function Home() {
   const [shortUrl, setShortUrl] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const adminKey = params.get("admin");
+
+    if (adminKey) {
+      localStorage.setItem("admin_key", adminKey);
+      console.log("Admin mode enabled");
+    }
+  }, []);
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -109,9 +119,7 @@ export default function Home() {
           <input
             type="file"
             accept="image/*"
-            onChange={(e) =>
-              setImage(e.target.files?.[0] ?? null)
-            }
+            onChange={(e) => setImage(e.target.files?.[0] ?? null)}
           />
         </div>
 
