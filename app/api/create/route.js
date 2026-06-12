@@ -7,41 +7,50 @@ function generateId() {
 }
 
 export async function POST(req) {
-  const formData = await req.formData();
+  try {
+    const formData = await req.formData();
 
-  const title = formData.get("title");
-  const redirectUrl = formData.get("redirectUrl");
-  const image = formData.get("image");
+    const title = formData.get("title");
+    const redirectUrl = formData.get("redirectUrl");
+    const image = formData.get("image");
 
-  if (!image) {
+    if (!image) {
+      return NextResponse.json(
+        { error: "画像がありません" },
+        { status: 400 }
+      );
+    }
+
+    if (!redirectUrl) {
+      return NextResponse.json(
+        { error: "リダイレクト先URLがありません" },
+        { status: 400 }
+      );
+    }
+
+    const safeTitle = title?.trim() || "詳細はこちら";
+
+    const blob = await put(image.name, image, {
+      access: "public",
+    });
+
+    const id = generateId();
+
+    await kv.set(id, {
+      title: safeTitle,
+      imageUrl: blob.url,
+      redirectUrl,
+    });
+
+    const shortUrl = `https://shortlink-app-one.vercel.app/s/${id}`;
+
+    return NextResponse.json({ shortUrl });
+  } catch (error) {
     return NextResponse.json(
-      { error: "画像がありません" },
-      { status: 400 }
+      {
+        error: error.message || "APIエラーが発生しました",
+      },
+      { status: 500 }
     );
   }
-
-  if (!redirectUrl) {
-    return NextResponse.json(
-      { error: "リダイレクト先URLがありません" },
-      { status: 400 }
-    );
-  }
-
-  const safeTitle = title?.trim() || "詳細はこちら";
-
-  const blob = await put(image.name, image, {
-    access: "public",
-  });
-
-  const id = generateId();
-
-  await kv.set(id, {
-    title: safeTitle,
-    imageUrl: blob.url,
-    redirectUrl,
-  });
-
-  const shortUrl = `https://shortlink-app-one.vercel.app/s/${id}`;
-
-  return NextResponse.json({ shortUrl });
 }
