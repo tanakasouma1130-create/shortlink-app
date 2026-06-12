@@ -32,6 +32,7 @@ export async function POST(req) {
 
     const blob = await put(image.name, image, {
       access: "public",
+      addRandomSuffix: true,
     });
 
     const id = generateId();
