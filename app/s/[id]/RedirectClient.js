@@ -4,19 +4,18 @@ import { useEffect } from "react";
 
 export default function RedirectClient({ url }) {
   useEffect(() => {
+    console.log("redirect url:", url);
     if (url) {
-      setTimeout(() => {
-        window.location.href = url;
-      }, 300);
+      window.location.href = url;
     }
   }, [url]);
 
   return (
-    <div style={{ background: "#000", color: "#000", height: "100vh" }}>
-      移動中...
-      <a href={url} style={{ color: "#000" }}>
-        開く
-      </a>
+    <div style={{ padding: "30px", fontFamily: "sans-serif" }}>
+      <p>飛び先URL:</p>
+      <p>{url || "URLなし"}</p>
+
+      {url && <a href={url}>ここを押して開く</a>}
     </div>
   );
 }
