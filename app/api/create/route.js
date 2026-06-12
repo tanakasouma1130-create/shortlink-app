@@ -10,11 +10,19 @@ export async function POST(req: Request) {
   const formData = await req.formData();
 
   const title = formData.get("title") as string;
+  const redirectUrl = formData.get("redirectUrl") as string;
   const image = formData.get("image") as File;
 
   if (!image) {
     return NextResponse.json(
       { error: "画像がありません" },
+      { status: 400 }
+    );
+  }
+
+  if (!redirectUrl) {
+    return NextResponse.json(
+      { error: "リダイレクト先URLがありません" },
       { status: 400 }
     );
   }
@@ -30,6 +38,7 @@ export async function POST(req: Request) {
   await kv.set(id, {
     title: safeTitle,
     imageUrl: blob.url,
+    redirectUrl,
   });
 
   const shortUrl = `https://shortlink-app-one.vercel.app/${id}`;
