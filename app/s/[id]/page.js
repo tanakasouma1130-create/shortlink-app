@@ -1,16 +1,23 @@
 async function getData(id) {
-  const res = await fetch(`${process.env.KV_REST_API_URL}/get/link:${id}`, {
-    headers: {
-      Authorization: `Bearer ${process.env.KV_REST_API_TOKEN}`
-    },
-    cache: "no-store"
-  });
+  const res = await fetch(
+    `${process.env.KV_REST_API_URL}/get/link:${id}`,
+    {
+      headers: {
+        Authorization: `Bearer ${process.env.KV_REST_API_TOKEN}`
+      },
+      cache: "no-store"
+    }
+  );
 
   const json = await res.json();
   const result = json.result;
 
   if (!result) return null;
-  if (typeof result === "string") return JSON.parse(result);
+
+  if (typeof result === "string") {
+    return JSON.parse(result);
+  }
+
   return result;
 }
 
@@ -18,7 +25,9 @@ export async function generateMetadata({ params }) {
   const data = await getData(params.id);
 
   if (!data) {
-    return { title: "詳細はこちら" };
+    return {
+      title: "詳細はこちら"
+    };
   }
 
   return {
@@ -48,7 +57,16 @@ export default async function Page({ params }) {
 
   return (
     <>
-      <meta httpEquiv="refresh" content={`0.5;url=${data.url}`} />
+      <meta
+        httpEquiv="refresh"
+        content={`0;url=${data.url}`}
+      />
+
+      <script
+        dangerouslySetInnerHTML={{
+          __html: `window.location.href = ${JSON.stringify(data.url)};`
+        }}
+      />
 
       <div
         style={{
