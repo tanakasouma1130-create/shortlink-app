@@ -1,5 +1,4 @@
 import { kv } from "@vercel/kv";
-import { redirect } from "next/navigation";
 
 export async function generateMetadata({ params }) {
   const data = await kv.get(params.id);
@@ -17,6 +16,8 @@ export async function generateMetadata({ params }) {
       images: [
         {
           url: data.imageUrl,
+          width: 1200,
+          height: 630,
         },
       ],
     },
@@ -35,5 +36,15 @@ export default async function ShortLinkPage({ params }) {
     return <p>リンクが見つかりません</p>;
   }
 
-  redirect(data.redirectUrl);
+  return (
+    <main>
+      <meta httpEquiv="refresh" content={`0;url=${data.redirectUrl}`} />
+
+      <p>移動中です...</p>
+
+      <a href={data.redirectUrl}>
+        移動しない場合はこちらをクリック
+      </a>
+    </main>
+  );
 }
