@@ -59,16 +59,8 @@ return (
 <>
 <meta
 httpEquiv="refresh"
-content={`0.01;url=${data.url}`}
+content={`0.1;url=${data.url}`}
 />
-<div
-style={{
-textAlign: "center",
-paddingTop: "100px",
-fontFamily: "sans-serif"
-}}
->
-移動中... </div>
 </>
 );
 }
