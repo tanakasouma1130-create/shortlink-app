@@ -41,7 +41,7 @@ export async function POST(req) {
     redirectUrl,
   });
 
-  const shortUrl = `https://shortlink-app-one.vercel.app/${id}`;
+  const shortUrl = `https://shortlink-app-one.vercel.app/s/${id}`;
 
   return NextResponse.json({ shortUrl });
 }
