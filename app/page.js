@@ -48,6 +48,11 @@ export default function Home() {
 
       setMessage("リンク作成中...");
 
+      const adminKey =
+        typeof window !== "undefined"
+          ? new URLSearchParams(window.location.search).get("admin")
+          : null;
+
       const res = await fetch("/api/create", {
         method: "POST",
         headers: {
@@ -55,16 +60,27 @@ export default function Home() {
         },
         body: JSON.stringify({
           image: imageData.url,
-          url
+          url,
+          adminKey
         })
       });
 
       const createText = await res.text();
-      const data = JSON.parse(createText);
+
+      let data = {};
+
+      try {
+        data = JSON.parse(createText);
+      } catch {
+        setMessage(createText);
+        return;
+      }
 
       if (!res.ok) {
         if (data.upgrade) {
-          setMessage("無料作成は1回までです。Proプランに加入すると無制限で作成できます。");
+          setMessage(
+            "無料作成は1回までです。Proプランに加入すると無制限で作成できます。"
+          );
           setNeedUpgrade(true);
           return;
         }
@@ -81,10 +97,19 @@ export default function Home() {
   }
 
   return (
-    <div style={{ maxWidth: "500px", margin: "50px auto", padding: "20px" }}>
+    <div
+      style={{
+        maxWidth: "500px",
+        margin: "50px auto",
+        padding: "20px"
+      }}
+    >
       <h1>画像付き短縮リンク作成</h1>
 
-      <p>写真をアップロードするだけで、SNSで目立つカード付き短縮リンクを作れます。</p>
+      <p>
+        写真をアップロードするだけで、
+        SNSで目立つカード付き短縮リンクを作れます。
+      </p>
 
       <input
         type="file"
@@ -92,31 +117,44 @@ export default function Home() {
         onChange={(e) => setFile(e.target.files[0])}
       />
 
-      <br /><br />
+      <br />
+      <br />
 
       <input
         placeholder="飛び先URL"
         value={url}
         onChange={(e) => setUrl(e.target.value)}
-        style={{ width: "100%", padding: "10px" }}
+        style={{
+          width: "100%",
+          padding: "10px"
+        }}
       />
 
-      <br /><br />
+      <br />
+      <br />
 
-      <button onClick={createLink}>作成</button>
+      <button onClick={createLink}>
+        作成
+      </button>
 
       <p>{message}</p>
 
       {needUpgrade && (
-        <button onClick={goPro}>
-          LinkShot Pro（月額500円）に加入
-        </button>
+        <>
+          <br />
+          <button onClick={goPro}>
+            LinkShot Pro（月額500円）に加入
+          </button>
+        </>
       )}
 
       {result && (
         <p>
-          完成リンク：<br />
-          <a href={result}>{result}</a>
+          完成リンク：
+          <br />
+          <a href={result} target="_blank">
+            {result}
+          </a>
         </p>
       )}
     </div>
