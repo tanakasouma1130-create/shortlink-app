@@ -42,11 +42,13 @@ export default function Home() {
       setLoading(true);
 
       const formData = new FormData();
+
       formData.append("title", title);
       formData.append("redirectUrl", redirectUrl);
       formData.append("image", image);
 
       const adminKey = localStorage.getItem("admin_key");
+
       if (adminKey) {
         formData.append("adminKey", adminKey);
       }
@@ -60,7 +62,11 @@ export default function Home() {
 
       if (!res.ok) {
         setError(data.error || "作成に失敗しました");
-        if (data.upgrade) setUpgrade(true);
+
+        if (data.upgrade) {
+          setUpgrade(true);
+        }
+
         return;
       }
 
@@ -76,7 +82,6 @@ export default function Home() {
   return (
     <main style={{ padding: 24 }}>
       <h1>LinkShot</h1>
-      <p style={{ color: "gray" }}>version: file-fix-2</p>
 
       <form onSubmit={handleSubmit}>
         <div>
@@ -87,7 +92,11 @@ export default function Home() {
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             placeholder="例：新しいお知らせ"
-            style={{ width: "100%", maxWidth: 400, padding: 8 }}
+            style={{
+              width: "100%",
+              maxWidth: 400,
+              padding: 8,
+            }}
           />
         </div>
 
@@ -101,7 +110,11 @@ export default function Home() {
             value={redirectUrl}
             onChange={(e) => setRedirectUrl(e.target.value)}
             placeholder="https://example.com"
-            style={{ width: "100%", maxWidth: 400, padding: 8 }}
+            style={{
+              width: "100%",
+              maxWidth: 400,
+              padding: 8,
+            }}
           />
         </div>
 
@@ -109,38 +122,59 @@ export default function Home() {
 
         <div>
           <label>OGP画像</label>
-          <br />
 
-          <label
-            style={{
-              display: "inline-block",
-              padding: "8px 14px",
-              background: "#eee",
-              borderRadius: 20,
-              cursor: "pointer",
-            }}
-          >
-            画像を選択
+          <div style={{ marginTop: 8 }}>
             <input
               type="file"
-              accept="image/*"
-              style={{ display: "none" }}
+              accept="image/jpeg,image/png,image/webp"
               onChange={(e) => {
                 const file = e.target.files?.[0];
 
-                if (file) {
-                  setImage(file);
-                  setImageName(file.name);
-                  setError("");
+                if (!file) return;
+
+                const allowedTypes = [
+                  "image/jpeg",
+                  "image/png",
+                  "image/webp",
+                ];
+
+                if (!allowedTypes.includes(file.type)) {
+                  setImage(null);
+                  setImageName("");
+                  setError(
+                    "JPEG / PNG / WebP の画像を選んでください"
+                  );
+                  return;
                 }
+
+                setImage(file);
+                setImageName(file.name);
+                setError("");
               }}
             />
-          </label>
+          </div>
 
-          {imageName && (
-            <p style={{ marginTop: 8 }}>
-              選択中：{imageName}
-            </p>
+          {image && (
+            <div
+              style={{
+                marginTop: 8,
+                display: "flex",
+                alignItems: "center",
+                gap: 8,
+              }}
+            >
+              <img
+                src={URL.createObjectURL(image)}
+                alt="preview"
+                style={{
+                  width: 32,
+                  height: 32,
+                  objectFit: "cover",
+                }}
+              />
+
+              <span>{imageName}</span>
+            </div>
           )}
         </div>
 
@@ -151,7 +185,16 @@ export default function Home() {
         </button>
       </form>
 
-      {error && <p style={{ color: "red", marginTop: 16 }}>{error}</p>}
+      {error && (
+        <p
+          style={{
+            color: "red",
+            marginTop: 16,
+          }}
+        >
+          {error}
+        </p>
+      )}
 
       {upgrade && (
         <a
@@ -173,7 +216,12 @@ export default function Home() {
       {shortUrl && (
         <div style={{ marginTop: 24 }}>
           <p>作成されたURL</p>
-          <a href={shortUrl} target="_blank" rel="noopener noreferrer">
+
+          <a
+            href={shortUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
             {shortUrl}
           </a>
         </div>
